@@ -1,40 +1,23 @@
 package de.weatherapi;
+import java.util.Scanner;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import de.weatherapi.WeatherInfo;
 
 public class MainWeatherAPI {
 
 	public static void main(String[] args) throws Exception {
-		String uri = "http://api.openweathermap.org/data/2.5/forecast?q=Berlin&mode=xml&appid=381a845f689c1bcd27937961e5af5b67";
+		System.out.println("Für welche Stadt soll das Wetter abgefragt werden?");
+		Scanner input = new Scanner(System.in);
+		String city = input.next();
+		System.out.println("Wetter wird für " + city + " abgefragt:");
 		
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		Document document = documentBuilder.parse(uri);
+		WeatherFetcher w= WeatherFetcher.getInstance();
 		
-		NodeList times = document.getElementsByTagName("time");
-		
-		for (int x = 0; x < times.getLength(); x++) {
-			Node time = times.item(x);
-			NamedNodeMap timeAttributes = time.getAttributes();
-			String timestamp = timeAttributes.getNamedItem("from").getNodeValue();
-			
-			NodeList children = time.getChildNodes();
-			for (int y = 0; y < children.getLength(); y++) {
-				Node child = children.item(y);
-				if (child.getNodeName() == "temperature") {
-					String temperature = child.getAttributes().getNamedItem("value").getNodeValue()+273;
-					System.out.println(timestamp + ": " + temperature);
-				}
-			}
-			
+		WeatherInfo[] weatherInfos = w.fetch(city);
+		for (int x = 0; x < weatherInfos.length; x++) {
+			WeatherInfo weatherInfo = weatherInfos[x];
+			System.out.println("Zeit: " + weatherInfo.getTimestamp() + ": Temp: " + weatherInfo.getTemperature());
 		}
-		
 	
 	}
 
